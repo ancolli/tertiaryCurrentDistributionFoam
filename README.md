@@ -16,15 +16,15 @@ In applications (A) you will find the scripts to compile the solver and post-pro
 In tutorial (B) you will find an example of a 2D parallel-plate cell. 
 
 # #  A) Applications
-**1.**  Solver
+**1.**  Solver  
 _A)_ Paste applications/utilities/solvers/potentialConcentrationFoam inside OpenFOAM user directory (Applications/Utilities/Solvers).  
 _B)_ Open a terminal inside potentialConcentrationFoam.  
 _C)_ Run wmake.  
-**2.**  Current density due to the Ox specie
+**2.**  Current density due to the Ox specie  
 _A)_ Paste applications/utilities/postProcessing/wallFlux inside OpenFOAM user directory (Applications/Utilities/postProcessing).  
 _B)_ Open a terminal inside wallFlux.  
 _C)_ Run wmake.  
-**3.**  Total current density (Ox specie + secondary reaction)
+**3.**  Total current density (Ox specie + secondary reaction)  
 _A)_ Paste applications/utilities/postProcessing/potentialWallFlux inside OpenFOAM user directory (Applications/Utilities/postProcessing).  
 _B)_ Open a terminal inside potentialWallFlux.  
 _C)_ Run wmake.  
