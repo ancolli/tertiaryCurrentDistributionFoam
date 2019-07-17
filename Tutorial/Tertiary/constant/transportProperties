@@ -64,6 +64,8 @@ C_redinf     50;//   mol/m3
 
 F	96485; //Cb/mol
 
+ba1	0.02777;
+
 ba	0.0277; //  V == used when control == 3
 
 
