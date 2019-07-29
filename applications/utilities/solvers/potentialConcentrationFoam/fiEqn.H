@@ -80,8 +80,10 @@ if (patchOK==1)  // checks if "wall_anode" is in the current patchName
 // overrelaxation 
         Vcell_old = Vcell;
 	Vcell = (control==1) ? Vcell+var : ((control==2) ? maxPot : Vcell-mult);//Vcell = Vcell-mult;//
-        Vcell = max(min(Vcell, maxPot),ref); // limited potentials
+        
         Vcell = Vcell_old+alpha*(Vcell-Vcell_old);
+
+	Vcell = max(min(Vcell, maxPot),ref); // limited potentials
         
         Results.set("Vcell", Vcell);
         Results.set("I", sumField);   

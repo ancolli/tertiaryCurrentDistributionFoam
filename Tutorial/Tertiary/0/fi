@@ -30,8 +30,8 @@ boundaryField
     {
 
 /*   type	fixedGradient;
-    gradient	uniform 0.77519; //j/kappa
-*/
+    gradient	uniform 7.7519; //j/kappa  */
+
     type            codedMixed;
     
     refValue        uniform #calc "($maxPot-$ref)";//$internalField;//
@@ -74,7 +74,11 @@ boundaryField
 	scalar C_oxinf = readScalar(kineticProperties.lookup("C_oxinf")) ;
 
         scalar Vcell = readScalar(Results.lookup("Vcell"));
- 
+ 	const dictionary& controlProperties = db().lookupObject<IOdictionary>("controlProperties");
+	scalar maxPot = readScalar(controlProperties.lookup("maxPot"));
+	scalar ref = readScalar(controlProperties.lookup("ref"));
+	Vcell = max(min(Vcell, maxPot),ref); // limited potentials
+
         scalarField jota1 = j0_Ni*C_red_boundary/C_redinf*exp((Vcell-fi_boundary)/ba_Ni);                    
         scalarField jota2 = -j0_Ni*C_ox_boundary/C_oxinf*exp((Vcell-fi_boundary)/bc_Ni);
 	scalarField jota3 = j0_O2*exp((Vcell-fi_boundary-E0_O2)/ba_O2);

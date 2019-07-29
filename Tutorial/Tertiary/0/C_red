@@ -15,6 +15,7 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 #include "include/transportProperties"
 
+
 dimensions      [0 -3 0 0 1 0 0];
 
 internalField   uniform $C_redinf;
@@ -117,6 +118,10 @@ boundaryField
         scalar F = readScalar(kineticProperties.lookup("F"));
 
         scalar Vcell = readScalar(Results.lookup("Vcell"));
+	const dictionary& controlProperties = db().lookupObject<IOdictionary>("controlProperties");
+	scalar maxPot = readScalar(controlProperties.lookup("maxPot"));
+	scalar ref = readScalar(controlProperties.lookup("ref"));
+	Vcell = max(min(Vcell, maxPot),ref); // limited potentials
  
         scalarField jota_k = j0_Ni*exp((Vcell-fi_boundary)/ba_Ni);                                
         scalarField jota_nok = -j0_Ni*C_ox_boundary/C_oxinf*exp((Vcell-fi_boundary)/bc_Ni); 
