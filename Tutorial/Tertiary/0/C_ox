@@ -39,18 +39,16 @@ boundaryField
 
     code
     #{
-        const fvPatch& p = this->patch();                                                                          // Actual boundary/patch
-    	label patchID = p.patch().boundaryMesh().findPatchID("wall_anode");                                        // Desired patch ID
+        const fvPatch& p = this->patch();                                                                          
+    	label patchID = p.patch().boundaryMesh().findPatchID("wall_anode");                                        
     	
-        const volScalarField& Dif_ox = this->db().objectRegistry::template lookupObject<volScalarField>("D_ox");   // Desired field 1
-        const volScalarField& Dif_red = this->db().objectRegistry::template lookupObject<volScalarField>("D_red"); // Desired field 2
-        const volScalarField& Con_red = this->db().objectRegistry::template lookupObject<volScalarField>("C_red"); // Desired field 3
+        const volScalarField& Dif_ox = this->db().objectRegistry::template lookupObject<volScalarField>("D_ox");   
+        const volScalarField& Dif_red = this->db().objectRegistry::template lookupObject<volScalarField>("D_red"); 
+        const volScalarField& Con_red = this->db().objectRegistry::template lookupObject<volScalarField>("C_red"); 
 
-	const surfaceScalarField snGradCon_red = fvc::snGrad(Con_red);
-        const scalarField& grad_C_red = snGradCon_red.boundaryField()[patchID];                                    // Desired field on desired patch
-
-        const scalarField& Deff_ox = Dif_ox.boundaryField()[patchID];                                              // Desired field on desired patch
-        const scalarField& Deff_red = Dif_red.boundaryField()[patchID];                                            // Desired field on desired patch
+	scalarField grad_C_red = Con_red.boundaryField()[patchID].snGrad();                                   
+        scalarField Deff_ox = Dif_ox.boundaryField()[patchID];                                            
+        scalarField Deff_red = Dif_red.boundaryField()[patchID];                                            
 	                  
         this->refValue() = 0;
         this->refGrad() = -(Deff_red/Deff_ox)*grad_C_red;
@@ -84,16 +82,15 @@ boundaryField
 
     code
     #{
-        const fvPatch& p = this->patch();                                                                          // Actual boundary/patch
-    	label patchID = p.patch().boundaryMesh().findPatchID("wall_cathode");                                       // Desired patch ID
+        const fvPatch& p = this->patch();                                                                          
+    	label patchID = p.patch().boundaryMesh().findPatchID("wall_cathode");                                       
         const fvMesh& mesh = patch().boundaryMesh().mesh();
-
-    	
-        const volScalarField& Dif_ox = this->db().objectRegistry::template lookupObject<volScalarField>("D_ox");   // Desired field 1
-        const volScalarField& fi_ = this->db().objectRegistry::template lookupObject<volScalarField>("fi"); // Desired field 2
+	
+        const volScalarField& Dif_ox = this->db().objectRegistry::template lookupObject<volScalarField>("D_ox");   
+        const volScalarField& fi_ = this->db().objectRegistry::template lookupObject<volScalarField>("fi"); 
         
-        const scalarField& Deff_ox = Dif_ox.boundaryField()[patchID];                                  // Desired field on desired patch
-        const scalarField& fi_boundary = fi_.boundaryField()[patchID];                                    // Desired field on desired patch
+        scalarField Deff_ox = Dif_ox.boundaryField()[patchID];                                  
+        scalarField fi_boundary = fi_.boundaryField()[patchID];                                   
 
         scalarField delta = 1.0/mesh.deltaCoeffs().boundaryField()[patchID]; 
 
