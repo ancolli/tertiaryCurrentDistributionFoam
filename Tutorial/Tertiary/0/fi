@@ -52,10 +52,10 @@ boundaryField
         const volScalarField& Con_red = this->db().objectRegistry::template lookupObject<volScalarField>("C_red");   // Desired field 3
         const volScalarField& Con_ox = this->db().objectRegistry::template lookupObject<volScalarField>("C_ox");
 
-        const scalarField& kf_boundary = kf_.boundaryField()[patchID];                                              // Desired field on desired patch
-        const scalarField& fi_boundary = fi_.boundaryField()[patchID];                                            // Desired field on desired patch
-        const scalarField& C_red_boundary = Con_red.boundaryField()[patchID];                             // Desired field on desired patch
-	const scalarField& C_ox_boundary = Con_ox.boundaryField()[patchID]; 
+        const scalarField kf_boundary = kf_.boundaryField()[patchID];                                              // Desired field on desired patch
+        const scalarField fi_boundary = fi_.boundaryField()[patchID];                                            // Desired field on desired patch
+        const scalarField C_red_boundary = Con_red.boundaryField()[patchID];                             // Desired field on desired patch
+	const scalarField C_ox_boundary = Con_ox.boundaryField()[patchID]; 
         
         scalarField delta = 1.0/mesh.deltaCoeffs().boundaryField()[patchID]; 
 
@@ -127,9 +127,9 @@ boundaryField
         const volScalarField& fi_ = this->db().objectRegistry::template lookupObject<volScalarField>("fi"); // Desired field 2
         const volScalarField& Con_ox = this->db().objectRegistry::template lookupObject<volScalarField>("C_ox");   // Desired field 3
         
-        const scalarField& kf_boundary = kf_.boundaryField()[patchID];                                              // Desired field on desired patch
-        const scalarField& fi_boundary = fi_.boundaryField()[patchID];                                            // Desired field on desired patch
-        const scalarField& C_ox_boundary = Con_ox.boundaryField()[patchID];                                              // Desired field on desired patch
+        const scalarField kf_boundary = kf_.boundaryField()[patchID];                                              // Desired field on desired patch
+        const scalarField fi_boundary = fi_.boundaryField()[patchID];                                            // Desired field on desired patch
+        const scalarField C_ox_boundary = Con_ox.boundaryField()[patchID];                                              // Desired field on desired patch
 
         scalarField delta = 1.0/mesh.deltaCoeffs().boundaryField()[patchID]; 
 

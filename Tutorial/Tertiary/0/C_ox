@@ -47,10 +47,10 @@ boundaryField
         const volScalarField& Con_red = this->db().objectRegistry::template lookupObject<volScalarField>("C_red"); // Desired field 3
 
 	const surfaceScalarField snGradCon_red = fvc::snGrad(Con_red);
-        const scalarField& grad_C_red = snGradCon_red.boundaryField()[patchID];                                    // Desired field on desired patch
+        const scalarField grad_C_red = snGradCon_red.boundaryField()[patchID];                                    // Desired field on desired patch
 
-        const scalarField& Deff_ox = Dif_ox.boundaryField()[patchID];                                              // Desired field on desired patch
-        const scalarField& Deff_red = Dif_red.boundaryField()[patchID];                                            // Desired field on desired patch
+        const scalarField Deff_ox = Dif_ox.boundaryField()[patchID];                                              // Desired field on desired patch
+        const scalarField Deff_red = Dif_red.boundaryField()[patchID];                                            // Desired field on desired patch
 	                  
         this->refValue() = 0;
         this->refGrad() = -(Deff_red/Deff_ox)*grad_C_red;
@@ -92,8 +92,8 @@ boundaryField
         const volScalarField& Dif_ox = this->db().objectRegistry::template lookupObject<volScalarField>("D_ox");   // Desired field 1
         const volScalarField& fi_ = this->db().objectRegistry::template lookupObject<volScalarField>("fi"); // Desired field 2
         
-        const scalarField& Deff_ox = Dif_ox.boundaryField()[patchID];                                  // Desired field on desired patch
-        const scalarField& fi_boundary = fi_.boundaryField()[patchID];                                    // Desired field on desired patch
+        const scalarField Deff_ox = Dif_ox.boundaryField()[patchID];                                  // Desired field on desired patch
+        const scalarField fi_boundary = fi_.boundaryField()[patchID];                                    // Desired field on desired patch
 
         scalarField delta = 1.0/mesh.deltaCoeffs().boundaryField()[patchID]; 
 
