@@ -146,7 +146,7 @@ boundaryField
  
         scalarField jota1 = -j0_SS316*C_ox_boundary/C_oxinf*exp((-fi_boundary)/bc_SS316);                                                        
         scalarField jota2 = j0_SS316*exp((-fi_boundary)/ba_SS316);
-	scalarField jota3 = j0_H2*exp((-fi_boundary-E0_H2)/bc_H2);
+	scalarField jota3 = -j0_H2*exp((-fi_boundary-E0_H2)/bc_H2);
         scalarField k0 = kf_boundary/delta;                                                                      
         
 	scalarField A = (1/k0)*(jota1/bc_SS316+jota2/ba_SS316+jota3/bc_H2);       

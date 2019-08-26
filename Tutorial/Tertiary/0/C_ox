@@ -88,9 +88,11 @@ boundaryField
 	
         const volScalarField& Dif_ox = this->db().objectRegistry::template lookupObject<volScalarField>("D_ox");   
         const volScalarField& fi_ = this->db().objectRegistry::template lookupObject<volScalarField>("fi"); 
+	const volScalarField& Con_red = this->db().objectRegistry::template lookupObject<volScalarField>("C_red");
         
         scalarField Deff_ox = Dif_ox.boundaryField()[patchID];                                  
-        scalarField fi_boundary = fi_.boundaryField()[patchID];                                   
+        scalarField fi_boundary = fi_.boundaryField()[patchID]; 
+	scalarField C_red_boundary = Con_red.boundaryField()[patchID];                                  
 
         scalarField delta = 1.0/mesh.deltaCoeffs().boundaryField()[patchID]; 
 
@@ -103,10 +105,11 @@ boundaryField
         scalar bc_SS316 = readScalar(kineticProperties.lookup("bc_SS316"));
 	scalar ba_SS316 = readScalar(kineticProperties.lookup("ba_SS316"));
         scalar C_oxinf = readScalar(kineticProperties.lookup("C_oxinf"));
+	scalar C_redinf = readScalar(kineticProperties.lookup("C_redinf"));
         scalar F = readScalar(kineticProperties.lookup("F"));
  
         scalarField jota_k = -j0_SS316*exp(-fi_boundary/bc_SS316);//                                        
-        scalarField jota_nok = j0_SS316*exp(-fi_boundary/ba_SS316);//
+        scalarField jota_nok = j0_SS316*C_red_boundary/C_redinf*exp(-fi_boundary/ba_SS316);//
 	scalarField k0 = Deff_ox/delta;                                                               
         
 	scalarField ak = nu_ox/nu_e*jota_k/C_oxinf/F/k0;        
