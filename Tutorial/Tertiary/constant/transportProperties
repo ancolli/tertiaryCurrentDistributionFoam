@@ -39,7 +39,7 @@ j0_SS316 	3.1e-2; // A/m2
 
 bc_H2	-0.04662;// V
 
-j0_H2	1.1e-1; // A/m2
+j0_H2	-1.1e-1; // A/m2
 
 E0_H2	-1.23; //  V
 
@@ -63,6 +63,8 @@ C_oxinf	     11; //  mol/m3
 C_redinf     50;//   mol/m3
 
 F	96485; //Cb/mol
+
+ba1	0.02777;
 
 ba	0.0277; //  V == used when control == 3
 
