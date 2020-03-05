@@ -1,4 +1,4 @@
-# v1.0.0
+# v2.0.0
 
 Cite as: https://iopscience.iop.org/article/10.1149/2.0132001JES
 DOI: https://doi.org/10.1149/2.0132001JES
@@ -14,8 +14,8 @@ This offering is not approved or endorsed by OpeFOAM Foundation, producer and di
 In applications (A) you will find the scripts to compile the solver and post-processing utilities in order to solve tertiary current distribution.
 In tutorial (B) you will find an example of a 2D parallel-plate cell. 
 
-version 1.0: Valid for two species. In case of need of add or substract species, the solver must be slightly modified
-version 2.0: Valid for k species without the need of modifying the solver (Authomatic generation of species from speciesProperties dictionary)
+**version 1.0:** Valid for two species. In case of need of add or substract species, the solver must be slightly modified.  
+**version 2.0:** Valid for k species without the need of modifying the solver (Authomatic generation of species from speciesProperties dictionary).  
 
 # #  A) Applications
 **1.**  Solver  
