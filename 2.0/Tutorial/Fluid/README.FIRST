@@ -1,9 +1,0 @@
-#To run in serial
-
-simpleFoam > log.simpleFoam &
-gnuplot scripts1/plot_res
-
-touch case.OpenFOAM
-paraview case.OpenFOAM
-
-
