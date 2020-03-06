@@ -5,6 +5,7 @@
        - fvm::laplacian(keff, fi)
     );
 
+    fi.relax();
 
 Info<< "Min/max fi:" << min(fi).value() << ' '
     << max(fi).value() << endl;
