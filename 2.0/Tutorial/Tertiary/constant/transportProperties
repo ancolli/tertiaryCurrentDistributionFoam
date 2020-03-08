@@ -60,7 +60,7 @@ C_oxinf	     11; //  mol/m3
 
 C_redinf     50;//   mol/m3
 
-ba	0.0277; //  V == used when control == 3
+ba	0.0277; //  V == used when control == 3 for cathodic main reaction
 
 
 // ************************************************************************* //

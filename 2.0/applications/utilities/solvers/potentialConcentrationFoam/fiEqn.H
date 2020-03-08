@@ -49,7 +49,6 @@ if (patchOK==1)  // checks if "wall_anode" is in the current patchName
 
         label cellNo = mesh.findCell(vector(controlProperties.lookup("refLocation")));
 	scalar Vref = fi[cellNo];
-        Results.set("Vref", Vref);
 
 // calculate cell potential
         scalar mult = 0.0;
@@ -70,7 +69,7 @@ if (patchOK==1)  // checks if "wall_anode" is in the current patchName
         scalar maxvar = readScalar(controlProperties.lookup("maxvar"));
         scalar tol_ref = readScalar(controlProperties.lookup("tol_ref"));
 
-        var = ref-Vref;
+        var=(ref < 0.0) ? -ref-Vref : ref-(Vcell-Vref); // <0 cathodic overpotential, >0 anodic overpotential//var = ref-Vref;
         var=(var>0) ? min(var,maxvar) : max(var,-maxvar);
         var=(mag(var/ref) > tol_ref) ? var : 0; // limito ref a x%
 
@@ -84,10 +83,12 @@ if (patchOK==1)  // checks if "wall_anode" is in the current patchName
         
         Vcell = Vcell_old+alpha*(Vcell-Vcell_old);
 
-	Vcell = max(min(Vcell, maxPot),ref); // limited potentials
-        
+	Vcell = max(min(Vcell, maxPot),mag(ref)); // limited potentials
+
+// writing Vcell, I and Vref         
         Results.set("Vcell", Vcell);
-        Results.set("I", sumField);   
+        Results.set("I", sumField); 
+	Results.set("Vref", (ref < 0.0) ? -Vref : (Vcell-Vref));//  
    }
    else
    {

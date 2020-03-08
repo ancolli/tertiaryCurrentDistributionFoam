@@ -24,7 +24,7 @@ maxPot 2.5; // max cell potential you expect (when control = 1 or 3) or cell pot
 
 // When control == 1
 
-ref 0.5; // set potential vs reference (when control = 1)
+ref -1.5; // set potential vs reference (when control = 1) // <0 for cathodic processes >0 for anodic ones
 
 tol_ref 0.002; //set tolerance for finding the Vcell and Icell for a given ref potential
 

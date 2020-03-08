@@ -17,7 +17,7 @@ FoamFile
 
 dimensions      [1 2 -3 0 0 -1 0];// V = kg*m^2/(A*s^3)
 
-internalField   uniform	#calc "($ref+$maxPot)/2";
+internalField   uniform	#calc "(mag($ref)+$maxPot)/2";
 
 boundaryField
 {
@@ -34,7 +34,7 @@ boundaryField
 
     type            codedMixed;
     
-    refValue        uniform #calc "($maxPot-$ref)";//$internalField;//
+    refValue        uniform #calc "($maxPot-mag($ref))";//$internalField;//
     refGradient     uniform 0;
     valueFraction   uniform 1;
 
@@ -111,7 +111,7 @@ boundaryField
 
     type            codedMixed;
     
-    refValue        uniform $ref;//$internalField;//
+    refValue        uniform #calc "(mag($ref))";//$internalField;//
     refGradient     uniform 0;
     valueFraction   uniform 1;
 
