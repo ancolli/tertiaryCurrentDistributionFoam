@@ -64,7 +64,7 @@ void Foam::functionObjects::wallFlux::calcFlux //void
     
     surfaceScalarField flux
     (
-      -1*96485*D_*fvc::snGrad(C_) // -n*F*D*dC/dx
+      -1*F_*D_*fvc::snGrad(C_) // -n*F*D*dC/dx
     );
 
     volScalarField::Boundary& wallFluxBf =
@@ -206,11 +206,44 @@ bool Foam::functionObjects::wallFlux::read(const dictionary& dict)
     }
 
     
-    dict.lookup("CName") >> CName_; //CName_ = dict.lookupOrDefault<word>("CName", "CName");
+    dict.lookup("CName") >> CName_; //
 
-    dict.lookup("D") >> D_;
+    
+    IOdictionary speciesProperties
+    (
+    	IOobject
+    	(
+        	"speciesProperties",
+        	mesh_.time().constant(),//runTime.constant(),
+        	mesh_,
+        	IOobject::MUST_READ,//MUST_READ_IF_MODIFIED,
+        	IOobject::NO_WRITE
+    	)
+    );
 
-    return true;
+
+    dictionary speciesName
+    (
+    	speciesProperties.subDict(CName_)
+    );
+
+    speciesName.lookup("D") >> D_;
+
+    IOdictionary transportProperties
+    (
+    	IOobject
+    	(
+        	"transportProperties",
+		mesh_.time().constant(),//mesh_.time().timeName(),
+        	mesh_,
+        	IOobject::MUST_READ,
+        	IOobject::NO_WRITE
+   	)
+   );
+
+   transportProperties.lookup("F") >> F_;
+
+   return true;
 }
 
 
@@ -230,7 +263,6 @@ bool Foam::functionObjects::wallFlux::execute()
        ),
        mesh_ 
     );
-
 
     calcFlux(C_, wallFlux);
 

@@ -95,6 +95,9 @@ protected:
         //- Optional list of patches to process
         labelHashSet patchSet_;
 
+	//- Faraday's constant
+	dimensionedScalar F_;
+
 	//- Diffusion coefficient
         dimensionedScalar D_;
 
@@ -115,15 +118,13 @@ private:
 
 //Private data
 
-//- Name of flux field, default is "C_red"
+//- Name of flux field
         word CName_;
 
  //- Run-time selectable finite volume options, e.g. sources, constraints
         fv::optionList fvOptions_;
 	
         volScalarField C_;
-
-
 
 	
 // Private Member Functions
