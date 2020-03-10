@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::functionObjects::wallFlux
+    Foam::functionObjects::speciesWallFlux
 
 Group
 
@@ -31,31 +31,32 @@ Description
 
     Example of function object specification:
     \verbatim
-    wallFlux1
+    speciesWallFlux1
     {
-        type           wallFlux;
-        libs ("libwallFluxFunctionObject.so");
+        type           speciesWallFlux;
+        libs ("libspeciesWallFluxFunctionObject.so");
         ...
         region      fluid;
         patches     (".*Wall");
+	CName	    speciesName;
     }
     \endverbatim
 
 Usage
     \table
         Property | Description                | Required   | Default value
-        type     | type name: wallFlux        | yes        |
+        type     | type name: speciesWallFlux        | yes        |
         patches  | list of patches to process | no         | all wall patches
         region   | region to be evaluated     | no         | default region
     \endtable
 
 SourceFiles
-    wallFlux.C
+    speciesWallFlux.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef wallFlux_H
-#define wallFlux_H
+#ifndef speciesWallFlux_H
+#define speciesWallFlux_H
 
 #include "fvMeshFunctionObject.H"
 
@@ -77,10 +78,10 @@ namespace functionObjects
 {
 
 /*---------------------------------------------------------------------------*\
-                   Class wallFlux Declaration
+                   Class speciesWallFlux Declaration
 \*---------------------------------------------------------------------------*/
 
-class wallFlux
+class speciesWallFlux
 :
     public fvMeshFunctionObject,
     public logFiles,
@@ -111,7 +112,7 @@ protected:
         (
             //const volScalarField& D_red_,
             const volScalarField& C_, //const
-            volScalarField& wallFlux
+            volScalarField& speciesWallFlux
         );
 
 private:
@@ -130,10 +131,10 @@ private:
 // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        wallFlux(const wallFlux&);
+        speciesWallFlux(const speciesWallFlux&);
 
         //- Disallow default bitwise assignment
-        void operator=(const wallFlux&);
+        void operator=(const speciesWallFlux&);
 
 
 public:
@@ -141,13 +142,13 @@ public:
 
 
     //- Runtime type information
-    TypeName("wallFlux");
+    TypeName("speciesWallFlux");
 
 
     // Constructors
 
         //- Construct from Time and dictionary
-        wallFlux
+        speciesWallFlux
         (
             const word& name,
             const Time& runTime,
@@ -157,12 +158,12 @@ public:
 
 
     //- Destructor
-    virtual ~wallFlux();
+    virtual ~speciesWallFlux();
 
 
     // Member Functions
 
-        //- Read the wallFlux data
+        //- Read the speciesWallFlux data
         virtual bool read(const dictionary&);
 
         //- Execute, currently does nothing
@@ -171,7 +172,7 @@ public:
         //- Execute at the final time-loop, currently does nothing
         virtual bool end();
 
-        //- Write the wallFlux
+        //- Write the speciesWallFlux
         virtual bool write();
 };
 

@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "wallFlux.H"
+#include "speciesWallFlux.H"
 
 #include "surfaceInterpolate.H"
 #include "fvcSnGrad.H"
@@ -36,15 +36,15 @@ namespace Foam
 {
 namespace functionObjects
 {
-    defineTypeNameAndDebug(wallFlux, 0);
-    addToRunTimeSelectionTable(functionObject, wallFlux, dictionary);
+    defineTypeNameAndDebug(speciesWallFlux, 0);
+    addToRunTimeSelectionTable(functionObject, speciesWallFlux, dictionary);
 }
 }
 
-void Foam::functionObjects::wallFlux::writeFileHeader(const label i)
+void Foam::functionObjects::speciesWallFlux::writeFileHeader(const label i)
 {
     // Add headers to output data
-    writeHeader(file(), "Wall flux");
+    writeHeader(file(), "Species Wall flux");
     writeCommented(file(), "Time");
     writeTabbed(file(), "patch");
     writeTabbed(file(), "min");
@@ -53,11 +53,11 @@ void Foam::functionObjects::wallFlux::writeFileHeader(const label i)
     file() << endl;
 }
 
-void Foam::functionObjects::wallFlux::calcFlux //void
+void Foam::functionObjects::speciesWallFlux::calcFlux //void
 (
     //const volScalarField& D_red_,
     const volScalarField& C_, //const
-    volScalarField& wallFlux
+    volScalarField& speciesWallFlux
 )
 
 {
@@ -67,21 +67,21 @@ void Foam::functionObjects::wallFlux::calcFlux //void
       -1*F_*D_*fvc::snGrad(C_) // -n*F*D*dC/dx
     );
 
-    volScalarField::Boundary& wallFluxBf =
-        wallFlux.boundaryFieldRef();
+    volScalarField::Boundary& speciesWallFluxBf =
+        speciesWallFlux.boundaryFieldRef();
 
     const surfaceScalarField::Boundary& fluxBf =
         flux.boundaryField();
 
-    forAll(wallFluxBf, patchi)
+    forAll(speciesWallFluxBf, patchi)
     {
-        wallFluxBf[patchi] = fluxBf[patchi];
+        speciesWallFluxBf[patchi] = fluxBf[patchi];
     }
 }
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 
-Foam::functionObjects::wallFlux::wallFlux
+Foam::functionObjects::speciesWallFlux::speciesWallFlux
 (
     const word& name,
     const Time& runTime,
@@ -111,7 +111,7 @@ Foam::functionObjects::wallFlux::wallFlux
     )
        
 {
-    volScalarField* wallFluxPtr
+    volScalarField* speciesWallFluxPtr
     (
 	new volScalarField
         (
@@ -130,7 +130,7 @@ Foam::functionObjects::wallFlux::wallFlux
 
 
     
-    mesh_.objectRegistry::store(wallFluxPtr);
+    mesh_.objectRegistry::store(speciesWallFluxPtr);
     
     read(dict);
     resetName(typeName);
@@ -140,12 +140,12 @@ Foam::functionObjects::wallFlux::wallFlux
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::functionObjects::wallFlux::~wallFlux()
+Foam::functionObjects::speciesWallFlux::~speciesWallFlux()
 {}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool Foam::functionObjects::wallFlux::read(const dictionary& dict)
+bool Foam::functionObjects::speciesWallFlux::read(const dictionary& dict)
 {
 
 
@@ -247,9 +247,9 @@ bool Foam::functionObjects::wallFlux::read(const dictionary& dict)
 }
 
 
-bool Foam::functionObjects::wallFlux::execute()
+bool Foam::functionObjects::speciesWallFlux::execute()
 {
-    volScalarField& wallFlux = lookupObjectRef<volScalarField>(type());
+    volScalarField& speciesWallFlux = lookupObjectRef<volScalarField>(type());
 
     volScalarField C_
     (
@@ -264,20 +264,20 @@ bool Foam::functionObjects::wallFlux::execute()
        mesh_ 
     );
 
-    calcFlux(C_, wallFlux);
+    calcFlux(C_, speciesWallFlux);
 
     return true;
 }
 
 
-bool Foam::functionObjects::wallFlux::end()
+bool Foam::functionObjects::speciesWallFlux::end()
 {
 
     return true;
 }
 
 
-bool Foam::functionObjects::wallFlux::write()
+bool Foam::functionObjects::speciesWallFlux::write()
 {
     Log << type() << " " << name() << " write:" << nl;
 
@@ -285,7 +285,7 @@ bool Foam::functionObjects::wallFlux::write()
 
     logFiles::write();
 
-    const volScalarField& wallFlux =
+    const volScalarField& speciesWallFlux =
         obr_.lookupObject<volScalarField>(type());
 
     const fvPatchList& patches = mesh_.boundary();
@@ -298,7 +298,7 @@ bool Foam::functionObjects::wallFlux::write()
         label patchi = iter.key();
         const fvPatch& pp = patches[patchi];
 
-        const scalarField& hfp = wallFlux.boundaryField()[patchi];
+        const scalarField& hfp = speciesWallFlux.boundaryField()[patchi];
 
         const scalar minHfp = gMin(hfp);
         const scalar maxHfp = gMax(hfp);

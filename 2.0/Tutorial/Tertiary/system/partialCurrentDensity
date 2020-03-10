@@ -8,8 +8,8 @@
  
 partialCurrentDensity
 {
-        type        wallFlux;//
-        libs        ("libwallFluxFunctionObject.so");//
+        type        speciesWallFlux;//
+        libs        ("libspeciesWallFluxFunctionObject.so");//
 	patches     ("wall_cathode" "wall_anode");
 	CName	    red;
 }
