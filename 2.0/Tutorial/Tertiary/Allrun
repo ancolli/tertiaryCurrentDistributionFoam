@@ -7,7 +7,17 @@ ln constant/transportProperties 0/include/transportProperties
 # Source tutorial run functions
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
+setResults()
+{
+	value=$(sed -En 's/maxPot[[:blank:]]+//p' constant/controlProperties | sed 's/;.*//') 
+	sed -E '/Vcell/s/[^[:blank:]]+$/'"$value;"/ -i constant/Results
+}
+
+
 runApplication blockMesh
+
+#Set dictionaries
+setResults
 
 #runApplication setFields
 
