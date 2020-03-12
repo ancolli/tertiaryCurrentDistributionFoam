@@ -61,10 +61,11 @@ Info<< "Reading field nut\n" << endl;
             "nut",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
+            IOobject::READ_IF_PRESENT,//MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh
+        mesh,
+	dimensionedScalar("0", dimensionSet(0,2,-1,0,0,0,0), 0.0)
     );
 
 Info<< "Reading field fi\n" << endl;
