@@ -49,12 +49,12 @@ boundaryField
  
         const volScalarField& Con_red = this->db().objectRegistry::template lookupObject<volScalarField>("C_red"); 
 
-	scalarField grad_C_red = Con_red.boundaryField()[patchID].snGrad();                                   
+	scalarField grad_C_red = -Con_red.boundaryField()[patchID].snGrad();  //gradients are defined inwards                                 
         const scalar Deff_ox = Dif_ox.value();                     
         const scalar Deff_red = Dif_red.value();
 	                  
         this->refValue() = 0;
-        this->refGrad() = -(Deff_red/Deff_ox)*grad_C_red;
+        this->refGrad() = (Deff_red/Deff_ox)*grad_C_red; //gradients are defined inwards
         this->valueFraction() = 0; 
     #};
  
