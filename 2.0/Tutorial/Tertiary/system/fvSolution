@@ -51,8 +51,12 @@ relaxationFactors
     equations 
     { 	
          "C_.*"          1;
-	  fi             1; 
     } 
+    
+    fields
+    { 	
+	  fi             0.9; 
+    }
    
 } 
 

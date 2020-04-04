@@ -102,8 +102,8 @@ boundaryField
 
         const dictionary& kineticProperties = db().lookupObject<IOdictionary>("transportProperties");
 
-	scalar nu_e = readScalar(kineticProperties.lookup("nu_e"));
-	scalar nu_ox = readScalar(kineticProperties.lookup("nu_ox"));
+	scalar nu_e = readScalar(kineticProperties.lookup("nu_e_c"));
+	scalar nu_ox = readScalar(kineticProperties.lookup("nu_ox_c"));
         
         scalar j0_SS316 = readScalar(kineticProperties.lookup("j0_SS316"));
         scalar bc_SS316 = readScalar(kineticProperties.lookup("bc_SS316"));
@@ -117,8 +117,8 @@ boundaryField
         scalarField jota_nok = j0_SS316*exp(-fi_boundary/ba_SS316);
 	scalarField k0 = Deff_ox/delta;                                                               
         
-	scalarField ak = nu_ox/nu_e*jota_k/C_oxinf/F/k0;        
-	scalarField bk = -nu_ox/nu_e*jota_nok/F/k0;
+	scalarField ak = -nu_ox/nu_e*jota_k/C_oxinf/F/k0;        
+	scalarField bk = nu_ox/nu_e*jota_nok/F/k0;
          
         this->refValue() = bk/ak;
         this->refGrad() = 0;

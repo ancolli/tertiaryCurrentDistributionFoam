@@ -115,8 +115,8 @@ boundaryField
         scalar ba_Ni = readScalar(kineticProperties.lookup("ba_Ni"));
         scalar bc_Ni = readScalar(kineticProperties.lookup("bc_Ni"));
 
-	scalar nu_e = readScalar(kineticProperties.lookup("nu_e"));
-	scalar nu_red = readScalar(kineticProperties.lookup("nu_red"));
+	scalar nu_e = readScalar(kineticProperties.lookup("nu_e_a"));
+	scalar nu_red = readScalar(kineticProperties.lookup("nu_red_a"));
 
         scalar C_redinf = readScalar(kineticProperties.lookup("C_redinf"));
         scalar C_oxinf = readScalar(kineticProperties.lookup("C_oxinf"));
@@ -134,8 +134,8 @@ boundaryField
         scalarField jota_nok = -j0_Ni*C_ox_boundary/C_oxinf*exp((Vcell-fi_boundary)/bc_Ni); 
         scalarField k0 = Deff_red/delta;                                                              
        
-	scalarField ak = nu_red/nu_e*jota_k/C_redinf/F/k0;        
-	scalarField bk = -nu_red/nu_e*jota_nok/F/k0;	     
+	scalarField ak = -nu_red/nu_e*jota_k/C_redinf/F/k0;        
+	scalarField bk = nu_red/nu_e*jota_nok/F/k0;	     
 
         this->refValue() = bk/ak;
         this->refGrad() = 0;

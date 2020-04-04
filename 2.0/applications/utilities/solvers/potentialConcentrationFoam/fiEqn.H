@@ -1,5 +1,6 @@
 {
 //potential field
+    fi.storePrevIter();
     solve
     (
        - fvm::laplacian(keff, fi)
