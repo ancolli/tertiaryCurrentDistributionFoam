@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2019 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2020 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -46,36 +46,37 @@ Foam::species::species
         mesh
     ),
     name_("C_" + speciesDict.dictName()),
-    speciesDict_(speciesDict),
-    D_(speciesDict_.lookup("D")),
-    diffusionModel_(speciesDict_.lookup("diffusionModel"))
-
+    speciesDict_(speciesDict)
+    
+   
 {
     Info<< "Reading field " << name_ <<"\n" << endl;
+    this->read(speciesDict);
 }
-
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::autoPtr<Foam::species> Foam::species::clone() const
-{
-    return autoPtr<species>(new species(*this));
-}
-
 bool Foam::species::read(const dictionary& speciesDict)
 {
-    speciesDict_ = speciesDict;
-    speciesDict_.lookup("diffusionModel") >> diffusionModel_;
+    	speciesDict_ = speciesDict;
+    
+    	speciesDict_.lookup("diffusionModel") >> diffusionModel_;
 
-    if (diffusionModel_ == "constant")
-    {
-        speciesDict_.lookup("D") >> D_;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    	if (diffusionModel_ == "constant")
+    	{
+        	speciesDict_.lookup("D") >> D_;
+        	return true;
+    	}
+        else
+        {
+	        FatalErrorIn
+        	(
+            		": In changeDictionaryDict, diffusionModel should be constant"
+            		"\n"
+        	)   
+            	<< exit(FatalError);	
+                return false;
+        }
 
 }
 

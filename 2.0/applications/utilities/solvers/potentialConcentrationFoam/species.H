@@ -57,9 +57,8 @@ class species
         word name_;
         dictionary speciesDict_;
 
-        dimensionedScalar D_;
-        word diffusionModel_;
-
+	word diffusionModel_;
+        dimensionedScalar D_;     
 public:
 
     // Constructors
@@ -70,9 +69,6 @@ public:
             const dictionary& speciesDict,
             const fvMesh& mesh
         );
-
-        //- Return clone
-        autoPtr<species> clone() const;
 
         //- Return a pointer to a new species created on freestore
         //  from Istream
@@ -96,9 +92,6 @@ public:
             }
         };
 
-    // Destructor
-
-
     // Member Functions
 
         const word& name() const
@@ -111,19 +104,23 @@ public:
             return name();
         }
 
+	//- Return const-access to species diffusion model
+        const word& diffusionModel() const
+        {
+            return diffusionModel_;
+        }
+
         //- Return const-access to species diffusion coefficient
         const dimensionedScalar& D() const
         {
             return D_;
         }
 	 
-        //- Return const-access to species diffusion model
-        const word& diffusionModel() const
-        {
-            return diffusionModel_;
-        }
+	//-Inherit read from volScalarField
+        using volScalarField::read;
 
         //- Read base transportProperties dictionary
+        
         bool read(const dictionary& speciesDict);
 };
 
