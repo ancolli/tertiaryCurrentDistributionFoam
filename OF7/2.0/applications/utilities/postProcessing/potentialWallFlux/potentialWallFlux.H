@@ -2,11 +2,11 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2018 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is NOT part of OpenFOAM.
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -54,8 +54,8 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef wallFlux_H
-#define wallFlux_H
+#ifndef potentialWallFlux_H
+#define potentialWallFlux_H
 
 #include "fvMeshFunctionObject.H"
 
@@ -64,7 +64,6 @@ SourceFiles
 #include "volFieldsFwd.H"
 #include "HashSet.H"
 
-//#include "volFields.H"
 #include "fvOptionList.H"
 
 
@@ -77,16 +76,15 @@ namespace functionObjects
 {
 
 /*---------------------------------------------------------------------------*\
-                   Class wallFlux Declaration
+                   Class potentialWallFlux Declaration
 \*---------------------------------------------------------------------------*/
 
-class wallFlux
+class potentialWallFlux
 :
     public fvMeshFunctionObject,
     public logFiles,
     public writeLocalObjects
 {
-
 
 protected:
 
@@ -103,9 +101,9 @@ protected:
         //- Calculate the flux
         void calcFlux
         (
-            const volScalarField& D_red_,
-            const volScalarField& C_red_, //const
-            volScalarField& wallFlux
+            const volScalarField& keff_,
+            const volScalarField& fi_, //const
+            volScalarField& potentialWallFlux
         );
 
 private:
@@ -115,34 +113,28 @@ private:
  //- Run-time selectable finite volume options, e.g. sources, constraints
         fv::optionList fvOptions_;
 
-	volScalarField D_red_;
+	volScalarField keff_;
 	
-        volScalarField C_red_;
+        volScalarField fi_;
 
-
-
-	
 // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        wallFlux(const wallFlux&);
+        potentialWallFlux(const potentialWallFlux&);
 
         //- Disallow default bitwise assignment
-        void operator=(const wallFlux&);
+        void operator=(const potentialWallFlux&);
 
 
 public:
-
-
-
     //- Runtime type information
-    TypeName("wallFlux");
+    TypeName("potentialWallFlux");
 
 
     // Constructors
 
         //- Construct from Time and dictionary
-        wallFlux
+        potentialWallFlux
         (
             const word& name,
             const Time& runTime,
@@ -152,12 +144,12 @@ public:
 
 
     //- Destructor
-    virtual ~wallFlux();
+    virtual ~potentialWallFlux();
 
 
     // Member Functions
 
-        //- Read the wallFlux data
+        //- Read the potentialWallFlux data
         virtual bool read(const dictionary&);
 
         //- Execute, currently does nothing
@@ -166,7 +158,7 @@ public:
         //- Execute at the final time-loop, currently does nothing
         virtual bool end();
 
-        //- Write the wallFlux
+        //- Write the potentialWallFlux
         virtual bool write();
 };
 

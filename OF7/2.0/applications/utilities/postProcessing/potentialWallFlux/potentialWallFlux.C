@@ -2,11 +2,11 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2018 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
-    This file is part of OpenFOAM.
+    This file is NOT part of OpenFOAM.
 
     OpenFOAM is free software: you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "wallFlux.H"
+#include "potentialWallFlux.H"
 
 #include "surfaceInterpolate.H"
 #include "fvcSnGrad.H"
@@ -36,52 +36,53 @@ namespace Foam
 {
 namespace functionObjects
 {
-    defineTypeNameAndDebug(wallFlux, 0);
-    addToRunTimeSelectionTable(functionObject, wallFlux, dictionary);
+    defineTypeNameAndDebug(potentialWallFlux, 0);
+    addToRunTimeSelectionTable(functionObject, potentialWallFlux, dictionary);
 }
 }
 
-void Foam::functionObjects::wallFlux::writeFileHeader(const label i)
+void Foam::functionObjects::potentialWallFlux::writeFileHeader(const label i)
 {
     // Add headers to output data
     writeHeader(file(), "Wall flux");
     writeCommented(file(), "Time");
     writeTabbed(file(), "patch");
-    writeTabbed(file(), "min");
-    writeTabbed(file(), "max");
-    writeTabbed(file(), "integral");
+    writeTabbed(file(), "min current density (A/m2)");
+    writeTabbed(file(), "max current density (A/m2)");
+    writeTabbed(file(), "current (A)");
+    writeTabbed(file(), "Absolute current (A)");
     file() << endl;
 }
 
-void Foam::functionObjects::wallFlux::calcFlux //void
+void Foam::functionObjects::potentialWallFlux::calcFlux //void
 (
-    const volScalarField& D_red_,
-    const volScalarField& C_red_, //const
-    volScalarField& wallFlux
+    const volScalarField& keff_,
+    const volScalarField& fi_, //const
+    volScalarField& potentialWallFlux
 )
 
 {
     
     surfaceScalarField flux
     (
-      -1*96485.33*fvc::interpolate(D_red_)*fvc::snGrad(C_red_) // -n*F*D*dC/dx
+      fvc::interpolate(keff_)*fvc::snGrad(fi_)//
     );
 
-    volScalarField::Boundary& wallFluxBf =
-        wallFlux.boundaryFieldRef();
+    volScalarField::Boundary& potentialWallFluxBf =
+        potentialWallFlux.boundaryFieldRef();
 
     const surfaceScalarField::Boundary& fluxBf =
         flux.boundaryField();
 
-    forAll(wallFluxBf, patchi)
+    forAll(potentialWallFluxBf, patchi)
     {
-        wallFluxBf[patchi] = fluxBf[patchi];
+        potentialWallFluxBf[patchi] = fluxBf[patchi];
     }
 }
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 
-Foam::functionObjects::wallFlux::wallFlux
+Foam::functionObjects::potentialWallFlux::potentialWallFlux
 (
     const word& name,
     const Time& runTime,
@@ -95,11 +96,12 @@ Foam::functionObjects::wallFlux::wallFlux
     patchSet_(),
     fvOptions_(mesh_),
 
-    D_red_
+    keff_
     (
        IOobject
        (
-           "D_red",
+           "keff",//
+           //"keffMean",
            mesh_.time().timeName(),
            mesh_,
            IOobject::MUST_READ,
@@ -108,11 +110,12 @@ Foam::functionObjects::wallFlux::wallFlux
        mesh_
     ),
  
-    C_red_
+    fi_
     (
        IOobject
        (
-          "C_red",
+          "fi",//
+          //"fiMean",
            mesh_.time().timeName(),
            mesh_,
            IOobject::MUST_READ,
@@ -125,7 +128,7 @@ Foam::functionObjects::wallFlux::wallFlux
 
     
 {
-    volScalarField* wallFluxPtr
+    volScalarField* potentialWallFluxPtr
     (
 	new volScalarField
         (
@@ -138,13 +141,13 @@ Foam::functionObjects::wallFlux::wallFlux
                 IOobject::NO_WRITE
             ),
             mesh_,
-            dimensionedScalar("0", C_red_.dimensions()/dimTime*dimLength, 0.0)
+            dimensionedScalar("0", fi_.dimensions()*keff_.dimensions()/dimLength, 0.0)
         )
     );
 
 
     
-    mesh_.objectRegistry::store(wallFluxPtr);
+    mesh_.objectRegistry::store(potentialWallFluxPtr);
     
     read(dict);
     resetName(typeName);
@@ -154,12 +157,12 @@ Foam::functionObjects::wallFlux::wallFlux
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::functionObjects::wallFlux::~wallFlux()
+Foam::functionObjects::potentialWallFlux::~potentialWallFlux()
 {}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-bool Foam::functionObjects::wallFlux::read(const dictionary& dict)
+bool Foam::functionObjects::potentialWallFlux::read(const dictionary& dict)
 {
 
 
@@ -224,15 +227,30 @@ bool Foam::functionObjects::wallFlux::read(const dictionary& dict)
 }
 
 
-bool Foam::functionObjects::wallFlux::execute()
+bool Foam::functionObjects::potentialWallFlux::execute()
 {
-    volScalarField& wallFlux = lookupObjectRef<volScalarField>(type());
-
-    volScalarField C_red_
+    volScalarField& potentialWallFlux = lookupObjectRef<volScalarField>(type());
+    
+    volScalarField keff_
     (
        IOobject
        (
-          "C_red",
+           "keff",//
+           //"keffMean",
+           mesh_.time().timeName(),
+           mesh_,
+           IOobject::MUST_READ,
+           IOobject::NO_WRITE
+       ),
+       mesh_
+    );
+    
+    volScalarField fi_
+    (
+       IOobject
+       (
+          "fi",//
+          //"fiMean",//
            mesh_.time().timeName(),
            mesh_,
            IOobject::MUST_READ,
@@ -243,20 +261,20 @@ bool Foam::functionObjects::wallFlux::execute()
     );
 
 
-    calcFlux(D_red_, C_red_, wallFlux);
+    calcFlux(keff_, fi_, potentialWallFlux);
 
     return true;
 }
 
 
-bool Foam::functionObjects::wallFlux::end()
+bool Foam::functionObjects::potentialWallFlux::end()
 {
 
     return true;
 }
 
 
-bool Foam::functionObjects::wallFlux::write()
+bool Foam::functionObjects::potentialWallFlux::write()
 {
     Log << type() << " " << name() << " write:" << nl;
 
@@ -264,7 +282,7 @@ bool Foam::functionObjects::wallFlux::write()
 
     logFiles::write();
 
-    const volScalarField& wallFlux =
+    const volScalarField& potentialWallFlux =
         obr_.lookupObject<volScalarField>(type());
 
     const fvPatchList& patches = mesh_.boundary();
@@ -277,12 +295,12 @@ bool Foam::functionObjects::wallFlux::write()
         label patchi = iter.key();
         const fvPatch& pp = patches[patchi];
 
-        const scalarField& hfp = wallFlux.boundaryField()[patchi];
+        const scalarField& hfp = potentialWallFlux.boundaryField()[patchi];
 
         const scalar minHfp = gMin(hfp);
         const scalar maxHfp = gMax(hfp);
-        const scalar integralHfp = gSum(magSf[patchi]*hfp)/gSum(magSf[patchi]);
-	const scalar current = gSum((magSf[patchi]*hfp)); //absolute value
+        const scalar integralHfp = gSum(magSf[patchi]*hfp);
+	const scalar currentAbs = gSum(mag(magSf[patchi]*hfp)); //absolute value
 
         if (Pstream::master())
         {
@@ -292,12 +310,12 @@ bool Foam::functionObjects::wallFlux::write()
                 << tab << minHfp
                 << tab << maxHfp
                 << tab << integralHfp
-		<< tab << current
+		<< tab << currentAbs
                 << endl;
         }
 
-        Log << "    min/max/average/current(" << pp.name() << ") = "
-            << minHfp << ", " << maxHfp << ", " << integralHfp << ", " << current << endl;
+        Log << "    min current density (A/m2)/max current density (A/m2)/current (A)/ Absolute current (A) (" << pp.name() << ") = "
+            << minHfp << ", " << maxHfp << ", " << integralHfp << ", " << currentAbs << endl;
     }
 
     Log << endl;
