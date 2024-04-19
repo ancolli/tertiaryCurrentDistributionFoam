@@ -64,7 +64,7 @@ void Foam::functionObjects::speciesWallFlux::calcFlux //void
     
     surfaceScalarField flux
     (
-      -1*F_*D_*fvc::snGrad(C_) // -n*F*D*dC/dx
+      F_*D_*fvc::snGrad(C_) // -n*F*D*dC/dx
     );
 
     volScalarField::Boundary& speciesWallFluxBf =
