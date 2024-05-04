@@ -83,22 +83,6 @@ volScalarField fi
     mesh
 );
 
-Info<< "Reading field Deff\n" << endl;
-
-volScalarField Deff
-(
-	IOobject
-	(
-	    "Deff",
-	    runTime.timeName(),
-	    mesh,
-	    IOobject::NO_READ,//MUST_READ,/
-	    IOobject::AUTO_WRITE//NO_WRITE
-	),
-	mesh,
-	dimensionedScalar("Deff",dimensionSet(0,2,-1,0,0,0,0),0)
-); 
-
 volScalarField Flux
 (
 	IOobject
@@ -131,17 +115,6 @@ IOdictionary transportProperties
 
 #include "createPhi.H"
 #include "readTransportProperties.H"
-
-/*dimensionedScalar Sct
-(
-	transportProperties.lookup("Sct")
-);*/
-
-/*dimensionedScalar kf
-(
-    transportProperties.lookup("kf")
-);*/
-
 
 volScalarField keff
 (
