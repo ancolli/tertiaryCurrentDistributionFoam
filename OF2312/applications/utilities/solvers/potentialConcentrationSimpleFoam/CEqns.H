@@ -1,16 +1,7 @@
 {
-            // concentration fields
+        // concentration fields
 	dictionary speciesSolveDict = mesh.solutionDict().subDict("solvers").subDict("C_species");
 	
-	//Deff == turbulence -> nut()/Sct +
-
-	//turbulent diffusivity	
-	/*volScalarField Dturb
-	(
-		"Dturb",
-		turbulence -> nut()/Sct
-	);*/
-
         forAll(speciesNameList, i)
         {
 
