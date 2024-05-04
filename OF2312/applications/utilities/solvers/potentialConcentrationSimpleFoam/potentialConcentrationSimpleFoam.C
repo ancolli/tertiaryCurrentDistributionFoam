@@ -26,7 +26,7 @@ Application
 
 Description
     sterady-state solver for incompressible, turbulent flow, using
-    SIMPLE algorithm coupled with a concentration field.
+    SIMPLE algorithm coupled with k concentration fields and a potential field.
 
     Sub-models include:
     - turbulence modelling, i.e. laminar, RAS or LES
