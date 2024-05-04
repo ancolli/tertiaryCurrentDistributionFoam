@@ -68,37 +68,6 @@ volVectorField U
 
 //From here
 
-/*Info<< "Reading field nut\n" << endl;
-
-volScalarField nut
-(
-	IOobject
-	(
-	    "nut",
-	    runTime.timeName(),
-	    mesh,
-	    IOobject::READ_IF_PRESENT,//MUST_READ,
-	    IOobject::AUTO_WRITE
-	),
-	mesh,
-	dimensionedScalar("0", dimensionSet(0,2,-1,0,0,0,0), 0.0)
-);*/
-
-// kinematic turbulent conductivity m2/s
-/*Info<< "Reading field alphat\n" << endl;
-volScalarField alphat
-(
-    IOobject
-    (
-        "alphat",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT,//MUST_READ,
-        IOobject::AUTO_WRITE
-    ),
-    mesh
-);*/
-
 Info<< "Reading field fi\n" << endl;
 
 volScalarField fi
@@ -114,7 +83,7 @@ volScalarField fi
     mesh
 );
 
-/*Info<< "Reading field DEff\n" << endl;
+Info<< "Reading field Deff\n" << endl;
 
 volScalarField Deff
 (
@@ -128,8 +97,7 @@ volScalarField Deff
 	),
 	mesh,
 	dimensionedScalar("Deff",dimensionSet(0,2,-1,0,0,0,0),0)
-); */
-
+); 
 
 volScalarField Flux
 (
@@ -139,7 +107,7 @@ volScalarField Flux
 	    runTime.timeName(),
 	    mesh,
 	    IOobject::NO_READ,
-	    IOobject::AUTO_WRITE//NO_WRITE//
+	    IOobject::NO_WRITE//AUTO_WRITE//
 	),
 	mesh,
 	dimensionedScalar("0", dimensionSet(0,-2,0,0,0,1,0), 0.0)
@@ -161,47 +129,33 @@ IOdictionary transportProperties
 	)
 );
 
+#include "createPhi.H"
+#include "readTransportProperties.H"
 
-/*Info<< "Reading diffusivity D\n" << endl;
-
-dimensionedScalar Dmol
-(
-	transportProperties.lookup("Dmol")
-);*/
-
-Info<< "Reading turbulent Schmidt number\n" << endl;
-
-dimensionedScalar Sct
+/*dimensionedScalar Sct
 (
 	transportProperties.lookup("Sct")
-);
+);*/
 
-dimensionedScalar kf
+/*dimensionedScalar kf
 (
     transportProperties.lookup("kf")
-);
+);*/
+
 
 volScalarField keff
-    (
-        IOobject
-        (
-            "keff",
-            runTime.timeName(),
-            mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar("keff", kf)
-    );
-
-Info<< "Reading Faraday constant F\n" << endl;
-
-dimensionedScalar F
 (
-    transportProperties.lookup("F")
+	IOobject
+	(
+	    "keff",
+	    runTime.timeName(),
+	    mesh,
+	    IOobject::MUST_READ,
+	    IOobject::AUTO_WRITE
+	),
+	mesh,
+	dimensionedScalar("keff", kf)
 );
-
 
 Info<< "Reading controlProperties\n" << endl;
 
@@ -244,16 +198,13 @@ IOdictionary Results
 
 //Until here
 
-#include "createPhi.H"
-
-
 label pRefCell = 0;
 scalar pRefValue = 0.0;
 setRefCell(p, simple.dict(), pRefCell, pRefValue);
 mesh.setFluxRequired(p.name());
 
 
-singlePhaseTransportModel laminarTransport(U, phi);
+//singlePhaseTransportModel laminarTransport(U, phi);
 
 autoPtr<incompressible::turbulenceModel> turbulence
 (

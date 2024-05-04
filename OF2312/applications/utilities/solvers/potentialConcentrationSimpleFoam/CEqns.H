@@ -1,13 +1,15 @@
 {
             // concentration fields
 	dictionary speciesSolveDict = mesh.solutionDict().subDict("solvers").subDict("C_species");
+	
+	//Deff == turbulence -> nut()/Sct +
 
 	//turbulent diffusivity	
-	volScalarField Dturb
+	/*volScalarField Dturb
 	(
 		"Dturb",
 		turbulence -> nut()/Sct
-	);
+	);*/
 
         forAll(speciesNameList, i)
         {
@@ -16,7 +18,7 @@
             (
                   //fvm::ddt(speciesList[i])
                   fvm::div(phi, speciesList[i], "div(phi,C_species)")
-                - fvm::laplacian(speciesList[i].D()+Dturb, speciesList[i], "laplacian(D,C_species)") //        
+                - fvm::laplacian(speciesList[i].D() + turbulence -> nut()/Sct, speciesList[i], "laplacian(D,C_species)")       
 		==
 		  fvOptions(speciesList[i])
 	    );

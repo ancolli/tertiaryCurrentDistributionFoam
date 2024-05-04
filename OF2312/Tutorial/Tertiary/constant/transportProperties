@@ -14,13 +14,14 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 transportModel  Newtonian;
-nu              nu [ 0 2 -1 0 0 0 0 ] 1.5e-06;
+
+nu              1.5e-06; //nu [ 0 2 -1 0 0 0 0 ]
 
 F		F [0 0 1 0 -1 1 0] 96485; //Cb/mol 
 
-kf		dimensions [-1 -3 3 0 0 2 0] 12.9; // S/m == A/V/m == A^2s^3/kg/m^3 
+kf		12.9; // S/m == A/V/m == A^2s^3/kg/m^3  // dimensions [-1 -3 3 0 0 2 0]
 
-Sct             Sct [ 0 0 0 0 0 0 0 ] 0.5;
+Sct             0.5; //Sct [ 0 0 0 0 0 0 0 ]
 
 
 nu_e_c	 -1;
