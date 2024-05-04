@@ -1,0 +1,156 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  6                                     |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      C_ox;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "include/transportProperties"
+
+dimensions      [0 -3 0 0 1 0 0];
+
+internalField   uniform $C_oxinf;
+
+boundaryField
+{
+
+    "wall_.*"       
+    {
+        type            zeroGradient;
+    }
+    wall_anode       
+    {
+
+    type            codedMixed;
+    
+    refValue        $internalField;
+    refGradient     uniform 0;
+    valueFraction   uniform 1;
+
+    name    anodeC_ox;   // name of generated BC
+
+    code
+    #{
+        const fvPatch& p = this->patch();                                                                          
+    	label patchID = p.patch().boundaryMesh().findPatchID("wall_anode");     
+       
+    	const dictionary& speciesProperties = db().lookupObject<IOdictionary>("speciesProperties");
+                                   
+    	const dimensionedScalar Dif_ox(speciesProperties.subDict("ox").lookup("D"));
+	const dimensionedScalar Dif_red(speciesProperties.subDict("red").lookup("D"));
+ 
+        const volScalarField& Con_red = this->db().objectRegistry::template lookupObject<volScalarField>("C_red"); 
+
+	scalarField grad_C_red = -Con_red.boundaryField()[patchID].snGrad();  //gradients are defined inwards                                 
+        const scalar Deff_ox = Dif_ox.value();                     
+        const scalar Deff_red = Dif_red.value();
+	                  
+        this->refValue() = 0;
+        this->refGrad() = (Deff_red/Deff_ox)*grad_C_red; //gradients are defined inwards
+        this->valueFraction() = 0; 
+    #};
+ 
+    codeInclude
+    #{
+        #include "fvCFD.H"
+        #include "fvcSnGrad.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude
+    #};
+
+    }
+
+    wall_cathode      
+    {
+
+    type            codedMixed;
+    
+    refValue        $internalField;
+    refGradient     uniform 0;
+    valueFraction   uniform 1;
+
+    name    cathodeC_ox;   // name of generated BC
+
+    code
+    #{
+        const fvPatch& p = this->patch();                                                                          
+    	label patchID = p.patch().boundaryMesh().findPatchID("wall_cathode");                           
+        const fvMesh& mesh = patch().boundaryMesh().mesh();
+
+    	const dictionary& speciesProperties = db().lookupObject<IOdictionary>("speciesProperties");
+                                   
+    	const dimensionedScalar Dif_ox(speciesProperties.subDict("ox").lookup("D"));
+	 
+        const volScalarField& fi_ = this->db().objectRegistry::template lookupObject<volScalarField>("fi"); 
+	   
+        const scalar Deff_ox = Dif_ox.value();                        
+        scalarField fi_boundary = fi_.boundaryField()[patchID]; 
+	
+        scalarField delta = 1.0/mesh.deltaCoeffs().boundaryField()[patchID]; 
+
+        const dictionary& kineticProperties = db().lookupObject<IOdictionary>("transportProperties");
+
+	scalar nu_e = readScalar(kineticProperties.lookup("nu_e_c"));
+	scalar nu_ox = readScalar(kineticProperties.lookup("nu_ox_c"));
+        
+        scalar j0_SS316 = readScalar(kineticProperties.lookup("j0_SS316"));
+        scalar bc_SS316 = readScalar(kineticProperties.lookup("bc_SS316"));
+	scalar ba_SS316 = readScalar(kineticProperties.lookup("ba_SS316"));
+        scalar C_oxinf = readScalar(kineticProperties.lookup("C_oxinf"));
+	
+	const dimensionedScalar Faraday(kineticProperties.lookup("F"));
+	const scalar F = Faraday.value();
+ 
+        scalarField jota_k = -j0_SS316*exp(-fi_boundary/bc_SS316);                                     
+        scalarField jota_nok = j0_SS316*exp(-fi_boundary/ba_SS316);
+	scalarField k0 = Deff_ox/delta;                                                               
+        
+	scalarField ak = -nu_ox/nu_e*jota_k/C_oxinf/F/k0;        
+	scalarField bk = nu_ox/nu_e*jota_nok/F/k0;
+         
+        this->refValue() = bk/ak;
+        this->refGrad() = 0;
+        this->valueFraction() = ak/(ak+1); 
+    #};
+ 
+    codeInclude
+    #{
+        #include "fvCFD.H"
+        #include "fvcSnGrad.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude
+    #};
+    }
+    outlet
+    {
+        type            zeroGradient;
+    }
+    inlet
+    {
+	type            fixedValue;
+        value           uniform $C_oxinf;  
+    }
+    frontAndBack
+    {
+        type            empty;   
+    }    
+ 
+}
+
+// ************************************************************************* //

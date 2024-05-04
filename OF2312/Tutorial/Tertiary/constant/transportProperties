@@ -1,0 +1,75 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.0                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+transportModel  Newtonian;
+nu              nu [ 0 2 -1 0 0 0 0 ] 1.5e-06;
+
+F		F [0 0 1 0 -1 1 0] 96485; //Cb/mol 
+
+kf		dimensions [-1 -3 3 0 0 2 0] 12.9; // S/m == A/V/m == A^2s^3/kg/m^3 
+
+Sct             Sct [ 0 0 0 0 0 0 0 ] 0.5;
+
+
+nu_e_c	 -1;
+
+nu_ox_c	 -1;
+
+nu_red_c  1;
+
+
+bc_SS316 	-0.08159;// V
+
+ba_SS316	0.03839;// V
+
+j0_SS316 	3.1e-2; // A/m2
+
+
+bc_H2	-0.04662;// V
+
+j0_H2	1.1e-1; // A/m2
+
+E0_H2	-1.23; //  V
+
+
+nu_e_a	  1;
+
+nu_ox_a	  1;
+
+nu_red_a  -1;
+
+
+ba_Ni	0.02777;//  V
+
+bc_Ni	-0.4351;//  V
+
+j0_Ni	22; //  A/m2
+
+
+ba_O2	0.037839;//  V
+
+j0_O2	6.85e-5; //  A/m2
+
+E0_O2	0.01; //  V
+
+
+C_oxinf	     11; //  mol/m3
+
+C_redinf     50;//   mol/m3
+
+ba	0.0277; //  V == used when control == 3 for cathodic main reaction
+
+
+// ************************************************************************* //

@@ -1,0 +1,177 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  6                                     |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      C_red;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "include/transportProperties"
+
+
+dimensions      [0 -3 0 0 1 0 0];
+
+internalField   uniform $C_redinf;
+
+boundaryField
+{
+
+    "wall_.*"       
+    {
+        type            zeroGradient;
+    }
+
+    wall_cathode      
+    {
+
+    type            codedMixed;
+    
+    refValue        $internalField;
+    refGradient     uniform 0;
+    valueFraction   uniform 1;
+
+    name    cathodeC_red;   // name of generated BC
+
+    code
+    #{
+        const fvPatch& p = this->patch();                                                                          // Actual boundary/patch
+    	label patchID = p.patch().boundaryMesh().findPatchID("wall_cathode");                                      // Desired patch ID
+    	
+        const dictionary& speciesProperties = db().lookupObject<IOdictionary>("speciesProperties");
+                                   
+    	const dimensionedScalar Dif_ox(speciesProperties.subDict("ox").lookup("D"));
+	const dimensionedScalar Dif_red(speciesProperties.subDict("red").lookup("D"));
+
+        const volScalarField& Con_ox = this->db().objectRegistry::template lookupObject<volScalarField>("C_ox");   // Desired field 3
+
+	scalarField grad_C_ox = -Con_ox.boundaryField()[patchID].snGrad();  //gradients are defined inwards                                
+
+        const scalar Deff_ox = Dif_ox.value();                                    
+        const scalar Deff_red = Dif_red.value();                               
+        
+        this->refValue() = 0;
+        this->refGrad() = (Deff_ox/Deff_red)*grad_C_ox;  //gradients are defined inwards
+        this->valueFraction() = 0;        
+    #};
+ 
+    codeInclude
+    #{
+        #include "fvCFD.H"
+        #include "fvcSnGrad.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude
+    #};
+
+    }
+
+    wall_anode       
+    {
+/*    type	fixedGradient;
+    gradient	uniform -143948.685; // jav/F/Deff
+*/
+    type            codedMixed;
+    
+    refValue        $internalField;
+    refGradient     uniform 0;
+    valueFraction   uniform 1;
+
+    name    anodeC_red;   // name of generated BC
+
+    code
+    #{
+        const fvPatch& p = this->patch();                                                                          // Actual boundary/patch
+    	label patchID = p.patch().boundaryMesh().findPatchID("wall_anode");                                       // Desired patch ID
+        const fvMesh& mesh = patch().boundaryMesh().mesh();
+
+	const dictionary& speciesProperties = db().lookupObject<IOdictionary>("speciesProperties");
+                                   
+    	const dimensionedScalar Dif_red(speciesProperties.subDict("red").lookup("D"));
+
+        const volScalarField& fi_ = this->db().objectRegistry::template lookupObject<volScalarField>("fi"); 
+        
+        const scalar Deff_red = Dif_red.value();    
+        scalarField fi_boundary = fi_.boundaryField()[patchID];                            // Desired field on desired patch
+        
+	const volScalarField& Con_ox = this->db().objectRegistry::template lookupObject<volScalarField>("C_ox");
+        scalarField C_ox_boundary = Con_ox.boundaryField()[patchID]; 
+
+        scalarField delta = 1.0/mesh.deltaCoeffs().boundaryField()[patchID]; 
+
+        const dictionary& kineticProperties = db().lookupObject<IOdictionary>("transportProperties");
+        const dictionary& Results = db().lookupObject<IOdictionary>("Results");
+        
+        scalar j0_Ni = readScalar(kineticProperties.lookup("j0_Ni"));
+        scalar ba_Ni = readScalar(kineticProperties.lookup("ba_Ni"));
+        scalar bc_Ni = readScalar(kineticProperties.lookup("bc_Ni"));
+
+	scalar nu_e = readScalar(kineticProperties.lookup("nu_e_a"));
+	scalar nu_red = readScalar(kineticProperties.lookup("nu_red_a"));
+
+        scalar C_redinf = readScalar(kineticProperties.lookup("C_redinf"));
+        scalar C_oxinf = readScalar(kineticProperties.lookup("C_oxinf"));
+
+	const dimensionedScalar Faraday(kineticProperties.lookup("F"));
+	const scalar F = Faraday.value();
+
+        scalar Vcell = readScalar(Results.lookup("Vcell"));
+	const dictionary& controlProperties = db().lookupObject<IOdictionary>("controlProperties");
+	scalar maxPot = readScalar(controlProperties.lookup("maxPot"));
+	scalar ref = readScalar(controlProperties.lookup("ref"));
+	Vcell = max(min(Vcell, maxPot),ref); // limited potentials
+ 
+        scalarField jota_k = j0_Ni*exp((Vcell-fi_boundary)/ba_Ni);                                
+        scalarField jota_nok = -j0_Ni*C_ox_boundary/C_oxinf*exp((Vcell-fi_boundary)/bc_Ni); 
+        scalarField k0 = Deff_red/delta;                                                              
+       
+	scalarField ak = -nu_red/nu_e*jota_k/C_redinf/F/k0;        
+	scalarField bk = nu_red/nu_e*jota_nok/F/k0;	     
+
+        this->refValue() = bk/ak;
+        this->refGrad() = 0;
+        this->valueFraction() = ak/(ak+1); 
+    #};
+ 
+    codeInclude
+    #{
+        #include "fvCFD.H"
+        #include "fvcSnGrad.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude
+    #};
+
+    }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+
+    inlet
+    {
+	type            fixedValue;
+        value           uniform $C_redinf;  
+    }   
+
+    frontAndBack
+    {
+        type            empty;   
+    } 
+ 
+}
+
+// ************************************************************************* //
